@@ -1,9 +1,16 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import ServicesMegaMenu from "./ServicesMegaMenu";
+import { servicesData } from "../data/servicesData";
+
+const slugify = (text) =>
+  text.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showServices, setShowServices] = useState(false);
+  const [showMobileServices, setShowMobileServices] = useState(false);
   const location = useLocation();
 
   const navItems = [
@@ -22,14 +29,13 @@ const Navigation = () => {
 
           {/* LOGO */}
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white rounded-md flex items-center justify-center overflow-hidden">
+            <div className="w-12 h-12 bg-white rounded-md overflow-hidden">
               <img
                 src="/logo.jpg"
                 alt="Vardhman Associates Logo"
                 className="w-full h-full object-contain"
               />
             </div>
-
             <div className="leading-tight">
               <h1 className="text-white font-bold text-xl tracking-wide">
                 VARDHMAN ASSOCIATES
@@ -42,19 +48,44 @@ const Navigation = () => {
 
           {/* DESKTOP MENU */}
           <div className="hidden md:flex items-center gap-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`text-sm font-semibold tracking-wide transition-colors ${
-                  location.pathname === item.path
-                    ? "text-[#4ea3ff]"
-                    : "text-white hover:text-[#4ea3ff]"
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) =>
+              item.label === "SERVICES" ? (
+                <div
+                  key={item.label}
+                  className="relative"
+                  onMouseEnter={() => setShowServices(true)}
+                  onMouseLeave={() => setShowServices(false)}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setShowServices((prev) => !prev)}
+                    className={`text-sm font-semibold tracking-wide ${
+                      location.pathname.startsWith("/services")
+                        ? "text-[#4ea3ff]"
+                        : "text-white hover:text-[#4ea3ff]"
+                    }`}
+                  >
+                    SERVICES
+                  </button>
+
+                  {showServices && (
+                    <ServicesMegaMenu close={() => setShowServices(false)} />
+                  )}
+                </div>
+              ) : (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`text-sm font-semibold tracking-wide ${
+                    location.pathname === item.path
+                      ? "text-[#4ea3ff]"
+                      : "text-white hover:text-[#4ea3ff]"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
 
             {/* PHONE */}
             <div className="ml-6 bg-[#203f6f] px-4 py-2 rounded-md">
@@ -80,21 +111,63 @@ const Navigation = () => {
       {/* MOBILE MENU */}
       {isMenuOpen && (
         <div className="md:hidden bg-[#1f3b63] border-t border-blue-900">
-          <div className="px-6 py-4 space-y-4">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setIsMenuOpen(false)}
-                className={`block text-sm font-semibold ${
-                  location.pathname === item.path
-                    ? "text-[#4ea3ff]"
-                    : "text-white"
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
+          <div className="px-6 py-4 space-y-4 max-h-[80vh] overflow-y-auto">
+
+            {navItems.map((item) =>
+              item.label === "SERVICES" ? (
+                <div key={item.label}>
+                  <button
+                    onClick={() =>
+                      setShowMobileServices((prev) => !prev)
+                    }
+                    className="w-full text-left text-sm font-semibold text-white"
+                  >
+                    SERVICES
+                  </button>
+
+                  {showMobileServices && (
+                    <div className="mt-4 pl-4 space-y-6 text-gray-200">
+                      {Object.values(servicesData).map((section) => (
+                        <div key={section.title}>
+                          <p className="text-xs uppercase text-gray-400 mb-2">
+                            {section.title}
+                          </p>
+                          <ul className="space-y-2">
+                            {section.services.map((service) => (
+                              <li key={service}>
+                                <Link
+                                  to={`/services/${slugify(service)}`}
+                                  onClick={() => {
+                                    setIsMenuOpen(false);
+                                    setShowMobileServices(false);
+                                  }}
+                                  className="block"
+                                >
+                                  {service}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`block text-sm font-semibold ${
+                    location.pathname === item.path
+                      ? "text-[#4ea3ff]"
+                      : "text-white"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
 
             <a
               href="tel:+919928857684"

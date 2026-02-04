@@ -10,6 +10,7 @@ import About from './pages/About';
 import Careers from './pages/Careers';
 import Contact from './pages/Contact';
 import Footer from './components/Footer';
+import ServiceDetail from './pages/ServiceDetail';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             <Route path="/careers" element={<Careers />} />
             <Route path="/contact" element={<Contact />} />
             <Route path='/admin' element={<AdminPage />} />
+             <Route path="/services/:slug" element={<ServiceDetail />} />
           </Routes>
         </main>
         <Footer />
